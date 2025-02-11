@@ -1,1 +1,1 @@
-#SCADA application for the Texas A&M On Site Sewage Facility
+SCADA application for the Texas A&M On Site Sewage Facility

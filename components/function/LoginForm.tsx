@@ -1,8 +1,8 @@
 'use client';
 import { redirect } from 'next/navigation'
 import React from 'react'
-import { Input } from '@/lib/components/ui/input'
-import { Button } from '@/lib/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { handleLogin } from '@/lib/actions/auth';
 
 export default function LoginForm() {

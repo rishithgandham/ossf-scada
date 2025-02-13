@@ -1,6 +1,6 @@
 
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import tam_agrilife from '@/images/tamu_agrilife_logo.png'
 
 import {
@@ -16,7 +16,7 @@ import {
     SidebarMenuItem,
     SidebarProvider,
     SidebarTrigger,
-} from "@/lib/components/ui/sidebar"
+} from "@/components/ui/sidebar"
 
 
 import { Activity, AlertCircle, BarChart3, CircuitBoard, ClipboardList, LayoutDashboard, LogOut, Settings } from "lucide-react"
@@ -30,8 +30,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuShortcut,
     DropdownMenuTrigger,
-} from "@/lib/components/ui/dropdown-menu"
-import { Button } from '@/lib/components/ui/button';
+} from "@/components/ui/dropdown-menu"
+import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 

@@ -6,7 +6,6 @@ import React from 'react'
 
 export default async function Page() {
 
-    // const { authenticated, email } = await auth();
 
     return (
         <>

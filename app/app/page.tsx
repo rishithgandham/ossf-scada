@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { auth } from "@/lib/dal";
 import { Activity, AlertCircle, CircuitBoard, Signal } from "lucide-react"
 
 import React from 'react'

@@ -1,17 +1,22 @@
 import 'server-only';
 
-import { jwtVerify, SignJWT } from 'jose';
+import { JWTPayload, jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
 type SessionPayload = {
-  sub: string;
+  sub: string | undefined;
   iat: number;
   exp: number;
 };
 
+export async function deleteSession() {
+  // destroy session cookie
+  const cookieStore = await cookies();
+  cookieStore.delete('session');
+}
 export async function createSession(email: string) {
   const exp = Date.now() + 7 * 24 * 60 * 60 * 1000;
   const iat = Date.now();
@@ -42,8 +47,7 @@ export async function encrypt(payload: SessionPayload) {
     .setExpirationTime('7d')
     .sign(encodedKey);
 }
-
-export async function decrypt(session: string  = '') {
+export async function decrypt(session: string = ''): Promise<JWTPayload> {
   // decrypt JWT, throw error if invalid
   try {
     const { payload } = await jwtVerify(session, encodedKey, {

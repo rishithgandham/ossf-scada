@@ -21,25 +21,28 @@ import { Button } from '@/components/ui/button';
 import AppSidebar from '@/components/function/AppSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import AppNavbar from '@/components/function/AppNavbar';
+import { getUser } from '@/lib/actions/auth';
 
 
 
-export default function Layout({
+export default async function Layout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const user = await getUser();
+
     return (
         <div>
             <SidebarProvider>
 
                 {/* sidebar */}
-                <AppSidebar />
+                <AppSidebar user={user} />
 
                 {/* main content */}
                 <div className='flex-1'>
 
-                    <AppNavbar />
+                    <AppNavbar user={user} />
                     {children}
                 </div>
 

@@ -17,10 +17,12 @@ import { Activity, AlertCircle, BarChart3, CircuitBoard, ClipboardList, LayoutDa
 import Image from "next/image";
 import tam_agrilife from '@/images/tamu_agrilife_logo.png';
 import { handleLogout } from "@/lib/actions/auth";
+import { User } from "@/lib/dal";
 
-export default function AppSidebar() {
+export default function AppSidebar({ user }: { user: User }) {
 
-    
+
+
 
     return (
         <div className="flex min-h-screen">
@@ -101,7 +103,7 @@ export default function AppSidebar() {
                                         <LogOut className="h-4 w-4" />
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
-                                <SidebarUser />
+                                <SidebarUser user={user} />
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
@@ -120,7 +122,7 @@ export default function AppSidebar() {
     )
 }
 
-function SidebarUser() {
+function SidebarUser({user}: {user: User}) {
     return (
         <div className="flex mt-5 items-center  space-x-2 px-2">
             {/* <Avatar className="">
@@ -129,8 +131,8 @@ function SidebarUser() {
             </Avatar> */}
 
             <div className="text-left">
-                <p className="text-xs font-medium ">Rishith Gandham</p>
-                <p className="text-xs text-muted-foreground">rishith.gandham@gmail.com</p>
+                <p className="text-xs font-medium ">{user.name}</p>
+                <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
         </div>
     );

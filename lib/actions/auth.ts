@@ -1,35 +1,22 @@
 'use server';
 import { loginFormSchema } from '@/forms/login';
 import { redirect } from 'next/navigation';
-import { createSession, encrypt } from '../session';
+import { createSession, deleteSession, encrypt } from '../session';
 import Error from 'next/error';
 import { cookies } from 'next/headers';
-import { auth } from '../dal';
+import { ALLOWED_USERS, verifyAuth } from '../dal';
 
-const ALLOWED_USERS = [
-  {
-    email: 'admin@tama.com',
-    name: 'Admin',
-    password: 'admins',
-  },
-  {
-    email: 'student@tama.com',
-    name: 'Rishith',
-    password: 'student_password',
-  },
-];
+
 
 
 export async function getUser() {
-  // check session validity
-  const { authenticated, email } = await auth()
-  return ALLOWED_USERS.find(user => user.email === email);
+  const { user } = await verifyAuth();
+  return user
 
 }
 
 export async function handleLogout() {
-  // destroy session cookie
-  (await cookies()).delete('session');
+  deleteSession();
   redirect('/login');
 }
 

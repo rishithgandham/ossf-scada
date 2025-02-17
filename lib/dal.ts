@@ -30,7 +30,7 @@ export async function verifyAuth() {
   const user = await db.query.usersTable.findFirst({
     where: (usersTable, { eq }) => eq(usersTable.email, payload.sub!),
   });
-  const exists = !!user
+  const exists = !!user;
   if (!exists) return redirect('/login');
 
   return {

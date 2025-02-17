@@ -1,4 +1,4 @@
-// import { UserInsert, UserSelect, usersTable } from "@/db/schema";
+// import { UserInsert, User, usersTable } from "@/db/schema";
 // import { hash } from "crypto";
 // import bcrypt from "bcrypt";
 

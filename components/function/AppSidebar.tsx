@@ -17,7 +17,7 @@ import { Activity, AlertCircle, BarChart3, CircuitBoard, ClipboardList, LayoutDa
 import Image from "next/image";
 import tam_agrilife from '@/images/tamu_agrilife_logo.png';
 import { handleLogout } from "@/lib/actions/auth";
-import { User } from "@/lib/dal";
+import { User } from "@/db/schema";
 
 export default function AppSidebar({ user }: { user: User }) {
 
@@ -122,7 +122,7 @@ export default function AppSidebar({ user }: { user: User }) {
     )
 }
 
-function SidebarUser({user}: {user: User}) {
+function SidebarUser({ user }: { user: User }) {
     return (
         <div className="flex mt-5 items-center  space-x-2 px-2">
             {/* <Avatar className="">

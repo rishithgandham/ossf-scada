@@ -7,7 +7,7 @@ import { DropdownMenuShortcut } from "../ui/dropdown-menu"
 import { SidebarTrigger } from "../ui/sidebar"
 import { handleLogout } from "@/lib/actions/auth";
 import { LogOut } from "lucide-react";
-import { User } from "@/lib/dal";
+import { User } from "@/db/schema";
 
 export default function AppNavbar({ user }: { user: User }) {
     return (

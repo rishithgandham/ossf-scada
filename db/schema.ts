@@ -7,6 +7,5 @@ export const usersTable = pgTable("users", {
   hashedPassword: varchar({ length: 255 }).notNull(),
 });
 
-
-export type UserSelect = typeof usersTable.$inferSelect
+export type User = typeof usersTable.$inferSelect
 export type UserInsert = typeof usersTable.$inferInsert

@@ -1,26 +1,20 @@
 'use server';
 import { loginFormSchema } from '@/forms/login';
 import { redirect } from 'next/navigation';
-import { createSession, deleteSession, encrypt } from '../session';
-import Error from 'next/error';
-import { cookies } from 'next/headers';
-import { ALLOWED_USERS, verifyAuth } from '../dal';
-
-
-
+import { createSession, deleteSession } from '../session';
+import { verifyAuth } from '../dal';
+import { db } from '@/db';
+import { verifyPassword } from '../password';
 
 export async function getUser() {
   const { user } = await verifyAuth();
-  return user
-
+  return user;
 }
 
 export async function handleLogout() {
   deleteSession();
   redirect('/login');
 }
-
-
 
 export async function handleLogin(formData: FormData) {
   // validate form data
@@ -35,21 +29,38 @@ export async function handleLogin(formData: FormData) {
     };
   }
 
-  // find user and create session if passwords match, redirect to app
-  const user = ALLOWED_USERS.find(
-    user =>
-      user.email === validatedFields.data.email &&
-      user.password === validatedFields.data.password
-  );
-  if (!user) {
+  // find user and check if they exist
+  const user = await db.query.usersTable.findFirst({
+    where: (usersTable, { eq }) =>
+      eq(usersTable.email, validatedFields.data.email),
+  });
+  const exists = !!user;
+  if (!exists) {
     return {
       errors: {
         email: ['Invalid Credentials'],
         password: ['Invalid Credentials'],
       },
+      message: 'User does not exist',
+    };
+  }
+
+  // check if passwords match
+  const match = await verifyPassword(
+    validatedFields.data.password,
+    user.hashedPassword
+  );
+  if (!match) {
+    return {
+      errors: {
+        email: [],
+        password: ['Invalid Credentials'],
+      },
       message: 'Invalid Credentials',
     };
   }
+
+  // create session
   try {
     const session = await createSession(user.email);
     console.log(session);
@@ -59,7 +70,7 @@ export async function handleLogin(formData: FormData) {
         email: [],
         password: [],
       },
-      message: error,
+      message: 'An unexpected error occurred',
     };
   }
   redirect('/app');

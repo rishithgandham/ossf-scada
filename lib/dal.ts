@@ -2,6 +2,7 @@ import 'server-only';
 import { cookies } from 'next/headers';
 import { decrypt } from './session';
 import { redirect } from 'next/navigation';
+import { db } from '@/db';
 
 export type User = {
   email: string;
@@ -9,34 +10,28 @@ export type User = {
   password: string;
 };
 
-export const ALLOWED_USERS: User[] = [
-  {
-    email: 'admin@tama.com',
-    name: 'Admin',
-    password: 'admins',
-  },
-  {
-    email: 'student@tama.com',
-    name: 'Rishith',
-    password: 'student_password',
-  },
-];
-
-export async function getSession() {
+export async function verifySession() {
   const session = (await cookies()).get('session')?.value;
   const payload = await decrypt(session);
+
+  // check if the payload is invalid
+  if (payload.invalid) return redirect('/login');
+
   return {
     payload,
   };
 }
 
 export async function verifyAuth() {
-  const { payload } = await getSession();
+  const { payload } = await verifySession();
   if (!payload.sub) return redirect('/login');
 
   // check if user exists
-  const user = ALLOWED_USERS.find(user => user.email === payload.sub);
-  if (!user) return redirect('/login');
+  const user = await db.query.usersTable.findFirst({
+    where: (usersTable, { eq }) => eq(usersTable.email, payload.sub!),
+  });
+  const exists = !!user
+  if (!exists) return redirect('/login');
 
   return {
     user: user,

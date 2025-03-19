@@ -56,8 +56,8 @@ interface Thing {
 async function getToken(): Promise<string> {
   const body = new URLSearchParams({
     grant_type: 'client_credentials',
-    client_id: CLIENT_ID,
-    client_secret: CLIENT_SECRET,
+    client_id: process.env.ARDUINO_API_CLIENT_ID!,
+    client_secret: process.env.ARDUINO_API_CLIENT_SECRET!,
     audience: 'https://api2.arduino.cc/iot',
   });
 

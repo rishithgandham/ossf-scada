@@ -4,21 +4,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { getDevice, getThing } from "@/lib/arduinoInit"
+import { Params } from "next/dist/server/request/params"
 
 export default async function SystemDetail({ params }: {
-    params: {
-        id: string
-    }
+    params: Params
 }) {
 
-    const { id } = await params;
+    const { slug } = await params;
 
 
-    const device = await getDevice(id);
+    const device = await getDevice(slug?.[0] ?? "");
 
-    console.log(device.thing
-
-    )
+    console.log(device.thing)
 
     return (
         <div className="container mx-auto p-6">

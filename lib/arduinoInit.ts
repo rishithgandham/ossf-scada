@@ -3,7 +3,7 @@
 const CLIENT_ID = "tRVdFAdlo0Q6XI2KEEuFBuUovN59u3Ab"
 const CLIENT_SECRET = "520VAXHh2l9YZJxT0fF3klAkUT6L7uaklVoOZEg9CEGbollm13WVZOl6mHkpjUq0"
 
-
+// eslint-disable-next-line
 const ArduinoIoTClient = require('@arduino/arduino-iot-client');
 
 

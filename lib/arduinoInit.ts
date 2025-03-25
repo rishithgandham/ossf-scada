@@ -1,8 +1,5 @@
 
 
-const CLIENT_ID = "tRVdFAdlo0Q6XI2KEEuFBuUovN59u3Ab"
-const CLIENT_SECRET = "520VAXHh2l9YZJxT0fF3klAkUT6L7uaklVoOZEg9CEGbollm13WVZOl6mHkpjUq0"
-
 // eslint-disable-next-line
 const ArduinoIoTClient = require('@arduino/arduino-iot-client');
 
@@ -108,6 +105,15 @@ async function getThing(thingId: string): Promise<Thing> {
   return thingsApi.thingsV2Show(thingId);
 }
 
+// Add this new function before the exports
+async function updateProperty(thingId: string, propertyId: string, value: any): Promise<any> {
+  const accessToken = await getToken();
 
+  const apiClient = ArduinoIoTClient.ApiClient.instance;
+  apiClient.authentications['oauth2'].accessToken = accessToken;
 
-export { getDevices, getDevice, getThing };
+  const propertiesApi = new ArduinoIoTClient.PropertiesV2Api(apiClient);
+  return propertiesApi.propertiesV2Publish(thingId, propertyId, { value });
+}
+
+export { getDevices, getDevice, getThing, updateProperty };

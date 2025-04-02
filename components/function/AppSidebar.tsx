@@ -18,11 +18,15 @@ import Image from "next/image";
 import tam_agrilife from '@/images/tamu_agrilife_logo.png';
 import { handleLogout } from "@/lib/actions/auth";
 import { User } from "@/db/schema";
+import { useRouter } from 'next/navigation'; 
 
 export default function AppSidebar({ user }: { user: User }) {
 
+    const router = useRouter();  // <-- Initialize useRouter hook to manage navigation
 
-
+    const redirectToAnalytics = () => {
+        router.push('/analytics');  // <-- Redirects to the '/analytics' page
+    };
 
     return (
         <div className="flex min-h-screen">
@@ -51,7 +55,7 @@ export default function AppSidebar({ user }: { user: User }) {
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                                 <SidebarMenuItem >
-                                    <SidebarMenuButton className='flex justify-between font-semibold text-sm' >
+                                    <SidebarMenuButton onClick={redirectToAnalytics} className='flex justify-between font-semibold text-sm' >
                                         <span>Analytics</span>
                                         <BarChart3 className="h-4 w-4" />
                                     </SidebarMenuButton>

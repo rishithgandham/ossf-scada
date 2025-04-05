@@ -27,7 +27,8 @@ export async function fetchDevice(deviceId: string) {
 export async function fetchThing(thingId: string) {
   try {
     const thing = await getThing(thingId);
-    return { success: true, data: thing };
+    // Serialize the data before returning
+    return { success: true, data: JSON.parse(JSON.stringify(thing)) };
   } catch (error) {
     return { success: false, error: (error as Error).message };
   }

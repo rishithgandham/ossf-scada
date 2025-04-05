@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState, useTransition, useCallback } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { updateDeviceProperty, fetchPropertyValue } from "@/lib/actions/arduino";
-import { useRouter } from "next/navigation";
+import { updateDeviceProperty } from "@/lib/actions/arduino";
 
 interface ArduinoProperty {
     id: string;
@@ -24,56 +23,46 @@ interface ArduinoProperty {
 interface PropertyCardProps {
     property: ArduinoProperty;
     thingId: string;
+    onUpdate: () => void;
 }
 
-export function PropertyCard({ property, thingId }: PropertyCardProps) {
-    const router = useRouter();
-    const [isPending, startTransition] = useTransition();
-    const [currentValue, setCurrentValue] = useState(property.last_value);
-    const [lastUpdateTime, setLastUpdateTime] = useState(property.value_updated_at);
+export function PropertyCard({ property, thingId, onUpdate }: PropertyCardProps) {
+    const [isUpdating, setIsUpdating] = useState(false);
+    // Track optimistic value separately from the actual property value
+    const [optimisticValue, setOptimisticValue] = useState<any>(null);
 
-    // Function to fetch the latest property value
-    const refreshValue = useCallback(async () => {
-        const result = await fetchPropertyValue(thingId, property.id);
-        if (result.success && result.data) {
-            setCurrentValue(result.data.value);
-            setLastUpdateTime(result.data.updated_at);
-        }
-    }, [thingId, property.id]);
-
-    // Set up polling for all properties
-    useEffect(() => {
-        refreshValue(); // Initial fetch
-        const interval = setInterval(refreshValue, 5000); // Poll every 5 seconds
-        return () => clearInterval(interval);
-    }, [refreshValue]);
-
-    // Update local state when property changes from parent
-    useEffect(() => {
-        setCurrentValue(property.last_value);
-        setLastUpdateTime(property.value_updated_at);
-    }, [property.last_value, property.value_updated_at]);
+    // Use optimistic value if available, otherwise use the actual property value
+    const displayValue = optimisticValue !== null ? optimisticValue : property.last_value;
 
     const handlePropertyUpdate = async (value: any) => {
-        if (value === currentValue) return; // Prevent unnecessary updates
+        if (value === property.last_value) return; // Prevent unnecessary updates
 
-        startTransition(async () => {
-            try {
-                const result = await updateDeviceProperty(thingId, property.id, value);
-                if (result.success) {
-                    setCurrentValue(value);
-                    setLastUpdateTime(new Date().toISOString());
-                    router.refresh();
-                    // Fetch the latest value after a short delay to ensure we get the updated value
-                    setTimeout(refreshValue, 1000);
-                }
-            } catch (error) {
-                console.error("Failed to update property:", error);
-                // Revert to previous value on error
-                setCurrentValue(property.last_value);
+        // Immediately update the UI with the new value
+        setOptimisticValue(value);
+        setIsUpdating(true);
+
+        try {
+            const result = await updateDeviceProperty(thingId, property.id, value);
+            if (result.success) {
+                onUpdate(); // Trigger parent refresh to get latest state
+            } else {
+                // If update failed, revert the optimistic update
+                setOptimisticValue(property.last_value);
             }
-        });
+        } catch (error) {
+            console.error("Failed to update property:", error);
+            // On error, revert the optimistic update
+            setOptimisticValue(property.last_value);
+        } finally {
+            setIsUpdating(false);
+        }
     };
+
+    // Reset optimistic value when property value changes from parent
+    // This means the server update has completed
+    if (optimisticValue !== null && property.last_value === optimisticValue) {
+        setOptimisticValue(null);
+    }
 
     return (
         <Card className="border-muted">
@@ -99,35 +88,34 @@ export function PropertyCard({ property, thingId }: PropertyCardProps) {
                     <div>
                         <h4 className="text-sm font-medium text-muted-foreground mb-1">Current Value</h4>
                         <div className="text-xl font-semibold">
-                            {property.type === "STATUS" ? (currentValue ? "True" : "False") : currentValue}
+                            {property.type === "STATUS" ? (displayValue ? "True" : "False") : displayValue}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            Last updated: {new Date(lastUpdateTime).toLocaleString()}
+                            Last updated: {new Date(property.value_updated_at).toLocaleString()}
                         </p>
                         {property.permission === "READ_WRITE" && (
                             <div className="mt-4">
                                 {property.type === "STATUS" ? (
                                     <div className="flex items-center space-x-2">
                                         <Switch
-                                            checked={!!currentValue}
-                                            disabled={isPending}
+                                            checked={!!displayValue}
+                                            disabled={isUpdating}
                                             onCheckedChange={handlePropertyUpdate}
                                         />
                                         <span className="text-sm text-muted-foreground">
-                                            {currentValue ? "On" : "Off"}
+                                            {displayValue ? "On" : "Off"}
                                         </span>
                                     </div>
                                 ) : (
                                     <Input
                                         type="text"
-                                        value={currentValue ?? ""}
+                                        value={displayValue ?? ""}
                                         className="w-full"
-                                        disabled={isPending}
-                                        onChange={(e) => setCurrentValue(e.target.value)}
-                                        onBlur={(e) => handlePropertyUpdate(e.target.value)}
+                                        disabled={isUpdating}
+                                        onChange={(e) => handlePropertyUpdate(e.target.value)}
                                     />
                                 )}
-                                {isPending && (
+                                {isUpdating && (
                                     <p className="text-xs text-muted-foreground mt-1">Updating...</p>
                                 )}
                             </div>

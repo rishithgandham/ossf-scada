@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { getDevice, getThing } from "@/lib/arduinoInit"
 import { PropertyCard } from "@/components/function/PropertyCard"
 import { Key } from "react"
+import { DeviceProperties } from "@/components/function/DeviceProperties"
 
 interface PageProps {
     params: {
@@ -127,15 +128,10 @@ export default async function SystemDetailPage({ params }: PageProps) {
                     <CardDescription>Connected IoT device properties and their current values</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-6">
-                        {device.thing?.properties?.map((property: any) => (
-                            <PropertyCard 
-                                key={property.id} 
-                                property={JSON.parse(JSON.stringify(property))}
-                                thingId={device.thing?.id || ''}
-                            />
-                        ))}
-                    </div>
+                    <DeviceProperties 
+                        thingId={device.thing?.id || ''} 
+                        initialProperties={JSON.parse(JSON.stringify(device.thing?.properties || []))} 
+                    />
                 </CardContent>
             </Card>
         </div>

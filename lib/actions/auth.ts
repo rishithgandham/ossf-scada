@@ -6,72 +6,81 @@ import { verifyAuth } from '../dal';
 import { db } from '@/db';
 import { verifyPassword } from '../password';
 
+type LoginError = {
+    errors: {
+        email?: string[];
+        password?: string[];
+    };
+    message: string;
+};
+
 export async function getUser() {
-  const { user } = await verifyAuth();
-  return user;
+    const { user } = await verifyAuth();
+    return user;
 }
 
 export async function handleLogout() {
-  deleteSession();
-  redirect('/login');
+    deleteSession();
+    redirect('/login');
 }
 
-export async function handleLogin(formData: FormData) {
-  // validate form data
-  const validatedFields = loginFormSchema.safeParse({
-    email: formData.get('email'),
-    password: formData.get('password'),
-  });
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Invalid Form Data',
-    };
-  }
+export async function handleLogin(prevState: any, formData: FormData): Promise<LoginError> {
+    // validate form data
+    const validatedFields = loginFormSchema.safeParse({
+        email: formData.get('email'),
+        password: formData.get('password'),
+    });
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Please check your input and try again',
+        };
+    }
+    else {
+      console.log('validatedFields', validatedFields);
+    }
 
-  // find user and check if they exist
-  const user = await db.query.usersTable.findFirst({
-    where: (usersTable, { eq }) =>
-      eq(usersTable.email, validatedFields.data.email),
-  });
-  const exists = !!user;
-  if (!exists) {
-    return {
-      errors: {
-        email: ['Invalid Credentials'],
-        password: ['Invalid Credentials'],
-      },
-      message: 'User does not exist',
-    };
-  }
+    // find user and check if they exist
+    const user = await db.query.usersTable.findFirst({
+        where: (usersTable, { eq }) =>
+            eq(usersTable.email, validatedFields.data.email),
+    });
 
-  // check if passwords match
-  const match = await verifyPassword(
-    validatedFields.data.password,
-    user.hashedPassword
-  );
-  if (!match) {
-    return {
-      errors: {
-        email: [],
-        password: ['Invalid Credentials'],
-      },
-      message: 'Invalid Credentials',
+    // Use the same generic message for both non-existent user and wrong password
+    const genericError = {
+        errors: {
+            email: ['Invalid email or password'],
+            password: ['Invalid email or password'],
+        },
+        message: 'Invalid email or password',
     };
-  }
 
-  // create session
-  try {
-    const session = await createSession(user.email);
-    console.log(session);
-  } catch (error) {
-    return {
-      errors: {
-        email: [],
-        password: [],
-      },
-      message: 'An unexpected error occurred',
-    };
-  }
-  redirect('/app');
+    if (!user) {
+        return genericError;
+    }
+
+    // check if passwords match
+    const match = await verifyPassword(
+        validatedFields.data.password,
+        user.hashedPassword
+    );
+    if (!match) {
+        return genericError;
+    }
+
+    // create session
+    try {
+        const session = await createSession(user.email);
+        console.log(session);
+        redirect('/app');
+        return genericError; // This will never be reached due to redirect, but TypeScript needs it
+    } catch (error) {
+        return {
+            errors: {
+                email: [],
+                password: [],
+            },
+            message: 'An unexpected error occurred. Please try again later.',
+        };
+    }
 }

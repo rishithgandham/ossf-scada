@@ -1,6 +1,6 @@
 'use client';
 import { redirect } from 'next/navigation'
-import React from 'react'
+import React, { useActionState, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { handleLogin } from '@/lib/actions/auth';
@@ -9,10 +9,20 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginFormSchema, LoginFormSchemaType } from '@/forms/login';
+import { useToast } from '@/hooks/use-toast';
 
-
+const initialState = {
+    errors: {
+        email: [],
+        password: []
+    },
+    message: ''
+}
 
 export default function LoginForm() {
+    const { toast } = useToast();
+
+    const [state, action, pending] = useActionState(handleLogin, initialState);
     const form = useForm({
         resolver: zodResolver(loginFormSchema),
         defaultValues: {
@@ -21,32 +31,26 @@ export default function LoginForm() {
         }
     })
 
-    async function handleSubmit(values: LoginFormSchemaType) {
-        // CONVERT TO FORM DATA
-        const formData = new FormData()
-        formData.append('email', values.email)
-        formData.append('password', values.password)
-        const response = await handleLogin(formData)
+    const formRef = useRef<HTMLFormElement>(null);
 
-        if (response) {
-            Object.entries(response.errors).forEach(([field, errors]) => {
-                form.setError(field as keyof typeof loginFormSchema.shape, {
-                    type: 'manual',
-                    message: errors?.[0] || ''
-                })
-            })
+    // Show toast for error message
+    React.useEffect(() => {
+        if (state?.message) {
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: state.message,
+            });
         }
-
-        // toast message
-        if (response?.message) alert(response.message)
-
-
-    }
+    }, [state, toast]);
 
     return (
         <>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)}>
+                <form ref={formRef}
+                    action={action}
+                    onSubmit={() => formRef.current?.requestSubmit()}>
+
                     <FormField
                         control={form.control}
                         name="email"
@@ -60,7 +64,9 @@ export default function LoginForm() {
                                     <FormDescription>
                                         Your email will not be shared
                                     </FormDescription>
-                                    <FormMessage />
+                                    <FormMessage>
+                                        {state?.errors?.email?.[0]}
+                                    </FormMessage>
                                 </div>
                             </FormItem>
                         )}
@@ -76,19 +82,24 @@ export default function LoginForm() {
                                     <Input type='password' placeholder="Enter your password" {...field} />
                                 </FormControl>
                                 <div className='flex gap-2'>
-                                    <FormMessage />
+                                    <FormMessage>
+                                        {state?.errors?.password?.[0]}
+                                    </FormMessage>
                                 </div>
                             </FormItem>
                         )}
                     />
-                    <Button type="submit" variant={'default'} className="w-full hover:bg-tama-secondary bg-tama text-white py-2 mt-10 ">
-                        Log In
+                    <Button 
+                        type="submit" 
+                        variant={'default'} 
+                        className="w-full hover:bg-tama-secondary bg-tama text-white py-2 mt-10"
+                        disabled={pending}
+                    >
+                        {pending ? 'Logging in...' : 'Log In'}
                     </Button>
 
                 </form>
-            </Form >
-
-
+            </Form>
         </>
     )
 }

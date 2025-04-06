@@ -4,19 +4,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { getDevice, getThing } from "@/lib/arduinoInit"
-import { PropertyCard } from "@/components/function/PropertyCard"
-import { Key } from "react"
 import { DeviceProperties } from "@/components/function/DeviceProperties"
 
 interface PageProps {
-    params: {
-        id: string
-    }
+    params: { id: string };
+    searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export default async function SystemDetailPage({ params }: PageProps) {
-    const deviceId = await params.id;
-    const deviceData = await getDevice(deviceId);
+    const deviceData = await getDevice(params.id);
 
     if (!deviceData) {
         return (

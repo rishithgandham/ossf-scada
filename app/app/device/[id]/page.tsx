@@ -6,15 +6,13 @@ import { Badge } from "@/components/ui/badge"
 import { getDevice, getThing } from "@/lib/arduinoInit"
 import { DeviceProperties } from "@/components/function/DeviceProperties"
 
-type Props = {
-    params: {
-        id: string;
-    };
-    searchParams?: { [key: string]: string | string[] | undefined };
-}
-
-export default async function SystemDetailPage(props: Props) {
-    const deviceData = await getDevice(props.params.id);
+export default async function SystemDetailPage({
+    params,
+}: {
+    params: Promise<{ id: string }>
+}) {
+    const { id } = await params;
+    const deviceData = await getDevice(id);
 
     if (!deviceData) {
         return (

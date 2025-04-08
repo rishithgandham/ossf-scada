@@ -71,16 +71,16 @@ export async function handleLogin(prevState: any, formData: FormData): Promise<L
     // create session
     try {
         const session = await createSession(user.email);
-        console.log(session);
-        redirect('/app');
-        return genericError; // This will never be reached due to redirect, but TypeScript needs it
     } catch (error) {
         return {
             errors: {
                 email: [],
                 password: [],
             },
-            message: 'An unexpected error occurred. Please try again later.',
+            message: 'Failed to create session. Please try again later.',
         };
     }
+
+    redirect('/app');
+    return genericError; // This will never be reached due to redirect, but TypeScript needs it
 }

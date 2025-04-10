@@ -36,9 +36,6 @@ export async function handleLogin(prevState: any, formData: FormData): Promise<L
             message: 'Please check your input and try again',
         };
     }
-    else {
-      console.log('validatedFields', validatedFields);
-    }
 
     // find user and check if they exist
     const user = await db.query.usersTable.findFirst({

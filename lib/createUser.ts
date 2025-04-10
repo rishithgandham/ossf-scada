@@ -5,19 +5,34 @@
 // // get drizzle instance
 // import { db } from "@/db";
 
+import { db } from '@/db';
+import { hashPassword } from './password';
+import { usersTable } from '@/db/schema';
 
-// function createUser() {
-//   ALLOWED_USERS.forEach(async (user) => {
-//     const salt = await bcrypt.genSalt(10);
-//     const hashed = await bcrypt.hash(user.password, salt);
+async function createUsers() {
+    // Delete all existing users
+    await db.delete(usersTable);
+    console.log('Deleted all existing users');
 
-//     await db.insert(usersTable).values({
-//       email: user.email,
-//       hashedPassword: hashed,
-//       name: user.name,
-//     })
+    // Create admin user
+    const adminPassword = await hashPassword('admins');
+    await db.insert(usersTable).values({
+        name: 'Admin User',
+        email: 'admin@tama.org',
+        hashedPassword: adminPassword,
+        isAdmin: true,
+    });
 
-//   })
-// }
+    // Create student user
+    const studentPassword = await hashPassword('students');
+    await db.insert(usersTable).values({
+        name: 'Student User',
+        email: 'student@tama.org',
+        hashedPassword: studentPassword,
+        isAdmin: false,
+    });
 
-// createUser();
+    console.log('Users created successfully!');
+}
+
+createUsers().catch(console.error);

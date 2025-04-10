@@ -13,11 +13,12 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Activity, AlertCircle, BarChart3, CircuitBoard, ClipboardList, LayoutDashboard, LogOut, Settings } from "lucide-react"
+import { Activity, AlertCircle, BarChart3, CircuitBoard, ClipboardList, LayoutDashboard, LogOut, Settings, UserCheck } from "lucide-react"
 import Image from "next/image";
 import tam_agrilife from '@/images/tamu_agrilife_logo.png';
 import { handleLogout } from "@/lib/actions/auth";
 import { User } from "@/db/schema";
+import Link from 'next/link';
 
 export default function AppSidebar({ user }: { user: User }) {
 
@@ -83,6 +84,16 @@ export default function AppSidebar({ user }: { user: User }) {
                                         <AlertCircle className="h-4 w-4" />
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
+                                {user.isAdmin && (
+                                    <SidebarMenuItem>
+                                        <Link href="/app/user_management">
+                                            <SidebarMenuButton className='flex justify-between font-semibold text-sm' >
+                                                <span>User Management</span>
+                                                <UserCheck className="h-4 w-4" />
+                                            </SidebarMenuButton>
+                                        </Link>
+                                    </SidebarMenuItem>
+                                )}
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
@@ -124,16 +135,12 @@ export default function AppSidebar({ user }: { user: User }) {
 
 function SidebarUser({ user }: { user: User }) {
     return (
-        <div className="flex mt-5 items-center  space-x-2 px-2">
-            {/* <Avatar className="">
-                <AvatarImage className="" src={'lll'} />
-                <AvatarFallback className="">RG</AvatarFallback>
-            </Avatar> */}
-
+        <div className="flex mt-5 items-center space-x-2 px-2">
             <div className="text-left">
-                <p className="text-xs font-medium ">{user.name}</p>
+                <p className="text-xs font-medium">{user.name}</p>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
+
         </div>
     );
 }

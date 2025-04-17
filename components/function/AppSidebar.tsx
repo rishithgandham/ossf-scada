@@ -13,7 +13,7 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Activity, AlertCircle, BarChart3, CircuitBoard, ClipboardList, LayoutDashboard, LogOut, Settings, UserCheck } from "lucide-react"
+import { Activity, AlertCircle, BarChart3, CircuitBoard, ClipboardList, LayoutDashboard, LayoutDashboardIcon, LogOut, Settings, UserCheck } from "lucide-react"
 import Image from "next/image";
 import tam_agrilife from '@/images/tamu_agrilife_logo.png';
 import { handleLogout } from "@/lib/actions/auth";
@@ -39,24 +39,15 @@ export default function AppSidebar({ user }: { user: User }) {
                         <SidebarGroupLabel>Overview</SidebarGroupLabel>
                         <SidebarGroupContent>
                             <SidebarMenu>
-                                <SidebarMenuItem >
-                                    <SidebarMenuButton className='flex justify-between font-semibold text-sm' >
-                                        <span>Dashboard</span>
-                                        <LayoutDashboard className="h-4 w-4" />
-                                    </SidebarMenuButton>
+                                <SidebarMenuItem>
+                                    <Link href="/app">
+                                        <SidebarMenuButton className='flex justify-between font-semibold text-sm' >
+                                            <span>Dashboard</span>
+                                            <LayoutDashboardIcon className="h-4 w-4" />
+                                        </SidebarMenuButton>
+                                    </Link>
                                 </SidebarMenuItem>
-                                <SidebarMenuItem >
-                                    <SidebarMenuButton className='flex justify-between font-semibold text-sm' >
-                                        <span>Monitoring</span>
-                                        <Activity className="h-4 w-4" />
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                                <SidebarMenuItem >
-                                    <SidebarMenuButton className='flex justify-between font-semibold text-sm' >
-                                        <span>Analytics</span>
-                                        <BarChart3 className="h-4 w-4" />
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
+                               
 
                             </SidebarMenu>
                         </SidebarGroupContent>
@@ -66,24 +57,7 @@ export default function AppSidebar({ user }: { user: User }) {
                         <SidebarGroupLabel>Management</SidebarGroupLabel>
                         <SidebarGroupContent>
                             <SidebarMenu>
-                                <SidebarMenuItem >
-                                    <SidebarMenuButton className='flex justify-between font-semibold text-sm' >
-                                        <span>Sensors</span>
-                                        <CircuitBoard className="h-4 w-4" />
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                                <SidebarMenuItem >
-                                    <SidebarMenuButton className='flex justify-between font-semibold text-sm' >
-                                        <span>Reports</span>
-                                        <ClipboardList className="h-4 w-4" />
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton className='flex justify-between font-semibold text-sm' >
-                                        <span>Alerts</span>
-                                        <AlertCircle className="h-4 w-4" />
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
+
                                 {user.isAdmin && (
                                     <SidebarMenuItem>
                                         <Link href="/app/user_management">

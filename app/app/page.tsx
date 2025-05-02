@@ -11,8 +11,6 @@ import { getDevices } from "@/lib/arduinoInit"
 import React from 'react'
 
 export default async function Page() {
-
-
     return (
         <>
             <main className=' w-full h-full flex justify-center items-center  '>
@@ -65,13 +63,8 @@ export default async function Page() {
 }
 
 async function PLCTable() {
-
-
     const devices = await getDevices();
 
-
-
-    // Format the timestamp to a more readable format
     const formatTime = (iso: string) => {
         const date = new Date(iso)
         return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })

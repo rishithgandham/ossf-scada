@@ -6,14 +6,17 @@ import { Badge } from "@/components/ui/badge"
 import { getDevice, getThing } from "@/lib/arduinoInit"
 import { DeviceProperties } from "@/components/function/DeviceProperties"
 
+// Device detail page component that displays information about a specific device
 export default async function SystemDetailPage({
     params,
 }: {
     params: Promise<{ id: string }>
 }) {
+    // Extract device ID from params and fetch device data
     const { id } = await params;
     const deviceData = await getDevice(id);
 
+    // Handle case when device is not found
     if (!deviceData) {
         return (
             <div className="container mx-auto p-6">
@@ -30,10 +33,10 @@ export default async function SystemDetailPage({
         );
     }
 
-    // Serialize the device data
+    // Serialize the device data for client-side rendering
     const device = JSON.parse(JSON.stringify(deviceData));
 
-    // Fetch the thing details if not included in device
+    // Fetch additional thing details if not included in device data
     if (!device.thing) {
         try {
             const thingData = await getThing(device.id);
@@ -45,6 +48,7 @@ export default async function SystemDetailPage({
 
     return (
         <div className="container mx-auto p-6">
+            {/* Page header with back button and device name */}
             <div className="flex items-center mb-6">
                 <Link href="/app/">
                     <Button variant="outline" size="sm" className="mr-4">
@@ -56,7 +60,9 @@ export default async function SystemDetailPage({
                 <Badge className="ml-4 bg-green-100 text-green-800">Online</Badge>
             </div>
 
+            {/* Device information cards grid */}
             <div className="grid gap-6 md:grid-cols-2">
+                {/* PLC Information card */}
                 <Card>
                     <CardHeader>
                         <CardTitle>PLC Information</CardTitle>
@@ -90,6 +96,7 @@ export default async function SystemDetailPage({
                     </CardContent>
                 </Card>
 
+                {/* Maintenance Information card */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Maintenance Information</CardTitle>
@@ -115,6 +122,7 @@ export default async function SystemDetailPage({
                 </Card>
             </div>
 
+            {/* Arduino Properties card */}
             <Card className="mb-8 mt-10">
                 <CardHeader>
                     <div className="flex items-center">

@@ -1,4 +1,5 @@
 'use client';
+// Import required components and hooks
 import { redirect } from 'next/navigation'
 import React, { useActionState, useRef } from 'react'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginFormSchema, LoginFormSchemaType } from '@/forms/login';
 import { useToast } from '@/hooks/use-toast';
 
+// Initial state for form errors
 const initialState = {
     errors: {
         email: [],
@@ -19,9 +21,11 @@ const initialState = {
     message: ''
 }
 
+// Login form component that handles user authentication
 export default function LoginForm() {
     const { toast } = useToast();
 
+    // Initialize form state and actions
     const [state, action, pending] = useActionState(handleLogin, initialState);
     const form = useForm({
         resolver: zodResolver(loginFormSchema),
@@ -33,7 +37,7 @@ export default function LoginForm() {
 
     const formRef = useRef<HTMLFormElement>(null);
 
-    // Show toast for error message
+    // Show toast notification for error messages
     React.useEffect(() => {
         if (state?.message) {
             toast({
@@ -51,6 +55,7 @@ export default function LoginForm() {
                     action={action}
                     onSubmit={() => formRef.current?.requestSubmit()}>
 
+                    {/* Email input field */}
                     <FormField
                         control={form.control}
                         name="email"
@@ -72,6 +77,7 @@ export default function LoginForm() {
                         )}
                     />
 
+                    {/* Password input field */}
                     <FormField
                         control={form.control}
                         name="password"
@@ -89,6 +95,7 @@ export default function LoginForm() {
                             </FormItem>
                         )}
                     />
+                    {/* Submit button */}
                     <Button 
                         type="submit" 
                         variant={'default'} 

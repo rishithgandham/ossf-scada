@@ -28,38 +28,31 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property, thingId, onUpdate }: PropertyCardProps) {
     const [isUpdating, setIsUpdating] = useState(false);
-    // Track optimistic value separately from the actual property value
     const [optimisticValue, setOptimisticValue] = useState<any>(null);
 
-    // Use optimistic value if available, otherwise use the actual property value
     const displayValue = optimisticValue !== null ? optimisticValue : property.last_value;
 
     const handlePropertyUpdate = async (value: any) => {
-        if (value === property.last_value) return; // Prevent unnecessary updates
+        if (value === property.last_value) return;
 
-        // Immediately update the UI with the new value
         setOptimisticValue(value);
         setIsUpdating(true);
 
         try {
             const result = await updateDeviceProperty(thingId, property.id, value);
             if (result.success) {
-                onUpdate(); // Trigger parent refresh to get latest state
+                onUpdate();
             } else {
-                // If update failed, revert the optimistic update
                 setOptimisticValue(property.last_value);
             }
         } catch (error) {
             console.error("Failed to update property:", error);
-            // On error, revert the optimistic update
             setOptimisticValue(property.last_value);
         } finally {
             setIsUpdating(false);
         }
     };
 
-    // Reset optimistic value when property value changes from parent
-    // This means the server update has completed
     if (optimisticValue !== null && property.last_value === optimisticValue) {
         setOptimisticValue(null);
     }
